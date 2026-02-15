@@ -22,9 +22,11 @@ Open `http://localhost:3000`
 - Set the production site URL in Vercel Environment Variables:
   - `NEXT_PUBLIC_SITE_URL=https://reverb-calculator.vercel.app`
   - Replace with your own domain later (e.g. `https://www.your-domain.com`) and rebuild.
-- Optional AdSense script ID:
+- Set the AdSense IDs:
+  - `ADSENSE_PUBLISHER_ID=pub-XXXXXXXXXXXXXXX` (used for `/ads.txt`)
   - `NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-XXXXXXXXXXXXXXX`
-- Set `public/ads.txt` with your real `ca-pub-` ID after approval account is active.
+- `/ads.txt` is served by `app/ads.txt/route.ts` and must return:
+  - `google.com, pub-XXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0`
 - Sitemap and robots are included:
   - `app/sitemap.ts`
   - `app/robots.ts`
