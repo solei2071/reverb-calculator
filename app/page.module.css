@@ -414,6 +414,73 @@
   animation: fadeIn 0.2s ease;
 }
 
+/* ─── SEO/Policy Content ─── */
+.contentSection {
+  margin-top: 1rem;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+}
+
+.contentTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: #1e293b;
+  font-weight: 800;
+}
+
+.contentText {
+  margin: 0;
+  color: #334155;
+  line-height: 1.65;
+  white-space: pre-line;
+}
+
+.faqWrap {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.faqItem {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 0.7rem 0.8rem;
+}
+
+.faqQuestion {
+  margin: 0;
+  font-size: 0.92rem;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.faqAnswer {
+  margin: 0.35rem 0 0;
+  color: #475569;
+  line-height: 1.6;
+  font-size: 0.86rem;
+}
+
+.contentLinks {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+  color: #334155;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.contentLinks a {
+  color: #4f46e1;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.contentLinks a:hover {
+  text-decoration: underline;
+}
+
 /* ─── Animations ─── */
 @keyframes fadeIn {
   from {

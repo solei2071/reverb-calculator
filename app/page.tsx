@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import styles from "./page.module.css";
 import {
   CalculatorMode,
@@ -16,6 +17,54 @@ import {
   normalizeBpm,
   parseTimeSignature,
 } from "../lib/tempo-calculator";
+
+const calculatorGuide = `
+This calculator helps producers keep delay, reverb, and LFO values in musical sync with the project tempo.
+Enter BPM and each note value immediately returns time values in milliseconds plus frequency in Hz for quick automation setup.
+
+In practical use, you normally match delay time to 1/4, 1/8, or 1/16 note lengths so rhythm stays tight.
+The triplet rows help when you want shuffled grooves, while dotted values add a swung, late-evolving motion for pads, vocals, and ambient tails.
+Reverb pre-delay and decay values are derived from delay-based note values so you can shape width and depth without losing tempo alignment.
+
+Why tempo-sync math is important:
+If BPM changes across sections, the same delay number can suddenly feel wrong and make a mix feel out of time.
+Using this calculator prevents this drift and makes transitions between verse, pre-chorus, and chorus cleaner.
+For example, delay-heavy vocal scenes often need exact values at higher tempo passages to avoid clutter and blur.
+
+How to get consistent results:
+1) Enter the exact BPM and choose the correct time signature first.
+2) Start with normal note values for foundational rhythmic alignment.
+3) If the groove requires swing or lifted pulse, try triplet timing next.
+4) Use dotted values when you want longer spacing without moving to the next full note length.
+5) In reverb mode, compare preset sizes and tune decay by ear while keeping pre-delay as the depth anchor.
+
+Practical production notes:
+Not every beat value sounds the same in every chain. Compressor latency, delay feedback, plugin character, and gain staging
+change how each number behaves in context. Use this calculator as a trusted baseline and then listen carefully before finalizing.
+`;
+
+const faqItems = [
+  {
+    question: "Why use a BPM calculator instead of guessing?",
+    answer:
+      "Manual values drift from the tempo over time, especially across songs with tempo automation. Using exact note math keeps effects locked to the beat and avoids phasey or messy repetition.",
+  },
+  {
+    question: "What is the difference between normal, triplet, and dotted values?",
+    answer:
+      "Normal follows standard note lengths. Triplet divides the beat into three parts (2/3 of the normal value), and dotted extends it by 1.5x for a swung feel.",
+  },
+  {
+    question: "Does this tool support custom time signatures?",
+    answer:
+      "Yes. Use presets or type any valid form like 5/4 or 7/8. The calculator updates reverb pre-delay and decay timings based on the total beats per bar for your tempo.",
+  },
+  {
+    question: "How should I read the reverb table?",
+    answer:
+      "Start from the pre-delay cell, then set decay after it. Shorter pre-delay makes the reverb closer to the dry source, longer pre-delay can open space in dense mixes.",
+  },
+];
 
 function toClipboard(value: string): Promise<boolean> {
   if (!navigator.clipboard?.writeText) return Promise.resolve(false);
@@ -296,6 +345,52 @@ export default function Home() {
             </div>
           </div>
         ) : null}
+
+        <section className={styles.contentSection}>
+          <h2 className={styles.contentTitle}>How this calculator helps</h2>
+          <p className={styles.contentText}>{calculatorGuide.trim()}</p>
+        </section>
+
+        <section className={styles.contentSection} aria-labelledby="faq-heading">
+          <h2 id="faq-heading" className={styles.contentTitle}>
+            Frequently Asked Questions
+          </h2>
+          <div className={styles.faqWrap}>
+            {faqItems.map((item) => (
+              <article key={item.question} className={styles.faqItem}>
+                <h3 className={styles.faqQuestion}>{item.question}</h3>
+                <p className={styles.faqAnswer}>{item.answer}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.contentSection} aria-labelledby="policy-links">
+          <h2 id="policy-links" className={styles.contentTitle}>More information</h2>
+          <p className={styles.contentText}>
+            Read more about the site, privacy handling, and support options:
+          </p>
+          <ul className={styles.contentLinks}>
+            <li>
+              <Link href="/about">About</Link>
+            </li>
+            <li>
+              <Link href="/privacy">Privacy Policy</Link>
+            </li>
+            <li>
+              <Link href="/contact">Contact</Link>
+            </li>
+            <li>
+              <Link href="/guide">Tempo Sync Guide</Link>
+            </li>
+            <li>
+              <Link href="/faq">FAQ</Link>
+            </li>
+            <li>
+              <Link href="/terms">Terms of Service</Link>
+            </li>
+          </ul>
+        </section>
 
         {copyMessage ? <p className={styles.copyMessage}>{copyMessage}</p> : null}
       </section>
