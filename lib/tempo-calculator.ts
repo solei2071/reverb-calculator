@@ -1,112 +1,140 @@
-export type CalculatorMode = "reverb" | "predelay" | "lfo";
+export type CalculatorMode = "delay" | "reverb" | "lfo";
 
-export type Division = {
+export type Notation = {
   id: string;
   label: string;
   beatValue: number;
   description: string;
 };
 
-export type ModeConfig = {
-  id: CalculatorMode;
-  name: string;
-  description: string;
-  divisionIds: string[];
+export type DelayRow = {
+  id: string;
+  noteLabel: string;
+  notesMs: number;
+  notesHz: number;
+  dottedMs: number;
+  dottedHz: number;
+  tripletMs: number;
+  tripletHz: number;
 };
 
-export const NOTE_DIVISIONS: Division[] = [
-  { id: "1/1", label: "1/1", beatValue: 4, description: "whole note" },
-  { id: "1/2", label: "1/2", beatValue: 2, description: "half note" },
-  { id: "1/2d", label: "1/2d", beatValue: 3, description: "dotted half note" },
-  { id: "1/4", label: "1/4", beatValue: 1, description: "quarter note" },
-  { id: "1/4d", label: "1/4d", beatValue: 1.5, description: "dotted quarter note" },
-  { id: "1/8", label: "1/8", beatValue: 0.5, description: "eighth note" },
-  { id: "1/8d", label: "1/8d", beatValue: 0.75, description: "dotted eighth note" },
-  { id: "1/8T", label: "1/8T", beatValue: 1 / 3, description: "triplet eighth note" },
-  { id: "1/16", label: "1/16", beatValue: 0.25, description: "sixteenth note" },
-  { id: "1/16T", label: "1/16T", beatValue: 1 / 6, description: "triplet sixteenth note" },
-  { id: "1/32", label: "1/32", beatValue: 0.125, description: "thirty-second note" },
-  { id: "1/64", label: "1/64", beatValue: 0.0625, description: "sixty-fourth note" },
-  { id: "1bar", label: "1 bar", beatValue: 4, description: "4/4 기준 1마디" },
-  { id: "2bars", label: "2 bars", beatValue: 8, description: "4/4 기준 2마디" },
-  { id: "4bars", label: "4 bars", beatValue: 16, description: "4/4 기준 4마디" },
-];
+export type ReverbSizeRow = {
+  name: string;
+  totalLabel: string;
+  totalBeats: number;
+  preDelayLabel: string;
+  preDelayBeatValue: number;
+};
 
-export const MODE_PRESETS: ModeConfig[] = [
+export type ReverbRow = {
+  name: string;
+  totalMs: number;
+  preDelayMs: number;
+  decayMs: number;
+  totalLabel: string;
+};
+
+export const MODE_PRESETS: ReadonlyArray<{ id: CalculatorMode; name: string; description: string }> = [
   {
-    id: "reverb",
-    name: "Reverb",
-    description: "리버브 디케이 시간 계산용 값",
-    divisionIds: ["1/1", "1/2", "1/4", "1/8", "1/16", "1/32", "1/64", "1/4d", "1/8d", "1/8T", "1/16T"],
+    id: "delay",
+    name: "Delay",
+    description: "Find rhythmically synced delay settings for your tempo.",
   },
   {
-    id: "predelay",
-    name: "Pre-Delay",
-    description: "프리디레이 값 계산용",
-    divisionIds: ["1/4", "1/8", "1/16", "1/32", "1/64", "1/2d", "1/4d", "1/8d", "1/8T", "1/16T"],
+    id: "reverb",
+    name: "Reverb / Pre-Delay",
+    description: "Find practical pre-delay and decay combinations from the delay values.",
   },
   {
     id: "lfo",
-    name: "LFO Time",
-    description: "LFO 주기(Hz 변환 전) 계산용",
-    divisionIds: ["1/4", "1/8", "1/16", "1/8T", "1/16T", "1/32", "1 bar", "2 bars", "4 bars"],
+    name: "LFO",
+    description: "Use delay ms and matching LFO speeds (Hz) for your tempo.",
   },
+];
+
+export const NOTE_NOTATIONS: Notation[] = [
+  { id: "1/1", label: "1/1", beatValue: 4, description: "1 Bar" },
+  { id: "1/2", label: "1/2", beatValue: 2, description: "2 Beats" },
+  { id: "1/4", label: "1/4", beatValue: 1, description: "1 Beat" },
+  { id: "1/8", label: "1/8", beatValue: 0.5, description: "1/2 Beat" },
+  { id: "1/16", label: "1/16", beatValue: 0.25, description: "1/4 Beat" },
+  { id: "1/32", label: "1/32", beatValue: 0.125, description: "1/8 Beat" },
+  { id: "1/64", label: "1/64", beatValue: 0.0625, description: "1/16 Beat" },
+  { id: "1/128", label: "1/128", beatValue: 0.03125, description: "1/32 Beat" },
+  { id: "1/256", label: "1/256", beatValue: 0.015625, description: "1/64 Beat" },
+  { id: "1/512", label: "1/512", beatValue: 0.0078125, description: "1/128 Beat" },
+];
+
+export const REVERB_SIZE_PRESETS: ReadonlyArray<ReverbSizeRow> = [
+  { name: "Hall", totalLabel: "2 Bars", totalBeats: 8, preDelayLabel: "1/32", preDelayBeatValue: 0.125 },
+  { name: "Large Room", totalLabel: "1 Bar", totalBeats: 4, preDelayLabel: "1/64", preDelayBeatValue: 0.0625 },
+  { name: "Small Room", totalLabel: "1/2 Note", totalBeats: 2, preDelayLabel: "1/128", preDelayBeatValue: 0.03125 },
+  { name: "Tight Ambience", totalLabel: "1/4 Note", totalBeats: 1, preDelayLabel: "1/256", preDelayBeatValue: 0.015625 },
 ];
 
 export const DEFAULT_BPM = 120;
 
-export type CalcRow = {
-  id: string;
-  label: string;
-  description: string;
-  beatValue: number;
-  ms: number;
-};
-
-const divisionMap = Object.fromEntries(NOTE_DIVISIONS.map((item) => [item.id, item]));
-
-export function getModeConfig(mode: CalculatorMode): ModeConfig | undefined {
-  return MODE_PRESETS.find((item) => item.id === mode);
-}
+export const MAX_BPM = 999;
+export const MIN_BPM = 1;
 
 export function normalizeBpm(raw: number): number {
   if (!Number.isFinite(raw)) return DEFAULT_BPM;
-  return Math.min(999, Math.max(1, raw));
+  return Math.min(MAX_BPM, Math.max(MIN_BPM, raw));
 }
 
 export function msFromBpm(bpm: number, beatValue: number): number {
   const safeBpm = normalizeBpm(bpm);
-  const msPerQuarter = 60000 / safeBpm;
-  return msPerQuarter * beatValue;
+  return (60000 / safeBpm) * beatValue;
+}
+
+export function hzFromMs(ms: number): number {
+  if (ms <= 0) return 0;
+  return 1000 / ms;
 }
 
 export function formatMs(ms: number): string {
   return `${ms.toFixed(2)} ms`;
 }
 
-export function getRows(mode: CalculatorMode, bpm: number): CalcRow[] {
-  const modeConfig = getModeConfig(mode);
-  if (!modeConfig) return [];
+export function formatHz(hz: number): string {
+  return `${hz.toFixed(2)} Hz`;
+}
 
-  return modeConfig.divisionIds.map((divisionId) => {
-    const item =
-      divisionMap[divisionId] ??
-      NOTE_DIVISIONS.find((d) => d.label === divisionId);
+export function getModeConfig(mode: CalculatorMode) {
+  return MODE_PRESETS.find((item) => item.id === mode);
+}
 
-    if (!item) {
-      return {
-        id: divisionId,
-        label: divisionId,
-        description: "",
-        beatValue: 0,
-        ms: 0,
-      };
-    }
+function toDelayRow(notation: Notation, bpm: number): DelayRow {
+  const base = msFromBpm(bpm, notation.beatValue);
+  const dotted = base * 1.5;
+  const triplet = base * 0.6666666667;
 
+  return {
+    id: notation.id,
+    noteLabel: `${notation.label} (${notation.description})`,
+    notesMs: base,
+    notesHz: hzFromMs(base),
+    dottedMs: dotted,
+    dottedHz: hzFromMs(dotted),
+    tripletMs: triplet,
+    tripletHz: hzFromMs(triplet),
+  };
+}
+
+export function getDelayRows(bpm: number): DelayRow[] {
+  return NOTE_NOTATIONS.map((notation) => toDelayRow(notation, bpm));
+}
+
+export function getReverbRows(bpm: number): ReverbRow[] {
+  return REVERB_SIZE_PRESETS.map((preset) => {
+    const totalMs = msFromBpm(bpm, preset.totalBeats);
+    const preDelayMs = msFromBpm(bpm, preset.preDelayBeatValue);
     return {
-      ...item,
-      id: item.id,
-      ms: msFromBpm(bpm, item.beatValue),
+      name: preset.name,
+      totalMs,
+      preDelayMs,
+      decayMs: totalMs - preDelayMs,
+      totalLabel: preset.totalLabel,
     };
   });
 }

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Reverb Calculator",
-  description: "BPM 기반 리버브/프리딜레이/LFO 타임 계산기",
+  title: "Rhythm Tools — Delay, Reverb & LFO Calculator",
+  description: "BPM-based delay, reverb, pre-delay, and LFO timing calculator for music producers",
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="en">
       <body>{children}</body>
     </html>
   );

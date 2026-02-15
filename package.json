@@ -22,7 +22,7 @@
     "eslint-config-next": "^14.2.32",
     "typescript": "^5.7.3"
   },
-  "description": "Reverb / Pre-Delay / LFO Time 계산기 (BPM → ms)",
+  "description": "Reverb / Pre-Delay / LFO time calculator based on BPM",
   "main": "index.js",
   "directories": {
     "lib": "lib"
