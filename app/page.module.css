@@ -1,0 +1,159 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+}
+
+.card {
+  width: min(960px, 100%);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 16px;
+  backdrop-filter: blur(4px);
+  padding: 1.75rem;
+  box-shadow: 0 20px 45px rgba(30, 41, 59, 0.14);
+}
+
+.title {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0.5rem 0 1.25rem;
+  color: #475569;
+}
+
+.modeButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.modeButton {
+  border: 1px solid #94a3b8;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  background: #e2e8f0;
+  color: #0f172a;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.modeButton:hover {
+  background: #dbeafe;
+}
+
+.active {
+  background: #1d4ed8;
+  color: #fff;
+  border-color: #1d4ed8;
+}
+
+.controlRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+
+.label {
+  font-weight: 700;
+}
+
+.input {
+  width: 180px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.heroInput {
+  width: min(100%, 420px);
+  min-height: 74px;
+  border-radius: 16px;
+  border: 2px solid #0f172a;
+  background: #ffffffcc;
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 0.9rem 1.1rem;
+}
+
+.help {
+  margin: 0.5rem 0 1rem;
+  color: #475569;
+}
+
+.emptyState {
+  margin-top: 0.5rem;
+  padding: 1rem 1rem;
+  border: 1px dashed #93c5fd;
+  border-radius: 12px;
+  color: #0369a1;
+  background: #e0f2fe80;
+}
+
+.modeInfo {
+  margin: 0.5rem 0 1rem;
+  color: #334155;
+}
+
+.modeTitle {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table thead th {
+  text-align: left;
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 0.75rem;
+  font-weight: 600;
+}
+
+.table td {
+  border-top: 1px solid #e2e8f0;
+  padding: 0.7rem 0.75rem;
+}
+
+.copyButton {
+  border: 1px solid #94a3b8;
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  background: #e0e7ff;
+  cursor: pointer;
+}
+
+.copyMessage {
+  margin: 1rem 0 0;
+  color: #0ea5e9;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 1.2rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+}

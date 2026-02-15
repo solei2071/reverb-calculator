@@ -1,0 +1,22 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Pretendard", "Inter", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  background:
+    radial-gradient(circle at 15% 20%, #d4f0ff 0%, transparent 40%),
+    radial-gradient(circle at 85% 10%, #fde2ff 0%, transparent 35%),
+    linear-gradient(180deg, #f6f8ff 0%, #eef2ff 60%, #e4eaff 100%);
+  color: #111827;
+}
+
+a {
+  color: inherit;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
