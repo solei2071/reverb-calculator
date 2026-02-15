@@ -75,9 +75,17 @@ export const TIME_SIGNATURES: ReadonlyArray<{ id: string; label: string; beatsPe
   { id: "2/4", label: "2/4", beatsPerBar: 2 },
   { id: "3/4", label: "3/4", beatsPerBar: 3 },
   { id: "4/4", label: "4/4", beatsPerBar: 4 },
-  { id: "5/4", label: "5/4", beatsPerBar: 5 },
-  { id: "6/4", label: "6/4", beatsPerBar: 6 },
+  { id: "6/8", label: "6/8", beatsPerBar: 3 },
 ];
+
+export function parseTimeSignature(input: string): { beatsPerBar: number } | null {
+  const match = input.trim().replace(/\s+/g, "").match(/^(\d{1,3})\/(\d{1,3})$/);
+  if (!match) return null;
+  const numerator = Number(match[1]);
+  const denominator = Number(match[2]);
+  if (numerator < 1 || numerator > 64 || denominator < 1 || denominator > 64) return null;
+  return { beatsPerBar: numerator * (4 / denominator) };
+}
 
 export const DEFAULT_BPM = 120;
 

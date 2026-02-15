@@ -14,6 +14,7 @@ import {
   formatHz,
   formatMs,
   normalizeBpm,
+  parseTimeSignature,
 } from "../lib/tempo-calculator";
 
 function toClipboard(value: string): Promise<boolean> {
@@ -30,18 +31,24 @@ export default function Home() {
   const [bpmInput, setBpmInput] = useState(String(DEFAULT_BPM));
   const [mode, setMode] = useState<CalculatorMode>("delay");
   const [timeSignatureId, setTimeSignatureId] = useState("4/4");
+  const [customSignature, setCustomSignature] = useState("");
   const [copyMessage, setCopyMessage] = useState("");
 
   const parsedBpm = Number.parseFloat(bpmInput);
   const bpm = useMemo(() => normalizeBpm(parsedBpm), [parsedBpm]);
   const isValidBpm = Number.isFinite(parsedBpm) && parsedBpm >= 1 && parsedBpm <= MAX_BPM;
 
-  const timeSignature = TIME_SIGNATURES.find((entry) => entry.id === timeSignatureId) ?? TIME_SIGNATURES[2];
+  const customParsed = useMemo(() => parseTimeSignature(customSignature), [customSignature]);
+  const isCustomTyping = customSignature.length > 0;
+  const isCustomValid = isCustomTyping && customParsed !== null;
+  const presetSignature = TIME_SIGNATURES.find((entry) => entry.id === timeSignatureId) ?? TIME_SIGNATURES[2];
+  const beatsPerBar = isCustomValid ? customParsed.beatsPerBar : presetSignature.beatsPerBar;
+  const signatureLabel = isCustomValid ? customSignature.trim() : presetSignature.label;
 
   const delayRows = useMemo(() => (isValidBpm ? getDelayRows(bpm) : []), [isValidBpm, bpm]);
   const reverbRows = useMemo(
-    () => (isValidBpm ? getReverbRows(bpm, timeSignature.beatsPerBar) : []),
-    [isValidBpm, bpm, timeSignature.beatsPerBar],
+    () => (isValidBpm ? getReverbRows(bpm, beatsPerBar) : []),
+    [isValidBpm, bpm, beatsPerBar],
   );
   const modeConfig = useMemo(() => getModeConfig(mode), [mode]);
 
@@ -91,15 +98,26 @@ export default function Home() {
                   key={signature.id}
                   type="button"
                   className={`${styles.signatureButton} ${
-                    timeSignatureId === signature.id ? styles.activeSignature : ""
+                    !isCustomTyping && timeSignatureId === signature.id ? styles.activeSignature : ""
                   }`}
-                  onClick={() => setTimeSignatureId(signature.id)}
+                  onClick={() => {
+                    setTimeSignatureId(signature.id);
+                    setCustomSignature("");
+                  }}
                   role="tab"
-                  aria-selected={timeSignatureId === signature.id}
+                  aria-selected={!isCustomTyping && timeSignatureId === signature.id}
                 >
                   {signature.label}
                 </button>
               ))}
+              <input
+                type="text"
+                className={`${styles.signatureCustomInput} ${isCustomTyping ? (isCustomValid ? styles.signatureCustomActive : styles.signatureCustomTyping) : ""}`}
+                placeholder="7/8"
+                value={customSignature}
+                onChange={(e) => setCustomSignature(e.target.value)}
+                aria-label="Type your time signature"
+              />
             </div>
           </div>
         </div>
@@ -157,7 +175,7 @@ export default function Home() {
                       return entries.map((entry, noteIndex) => (
                         <tr
                           key={`${row.id}-${entry.label}`}
-                          className={(index * 3 + noteIndex) % 2 === 1 ? styles.stripedRow : ""}
+                          className={index > 0 && noteIndex === 0 ? styles.groupFirstRow : ""}
                         >
                           {noteIndex === 0 ? (
                             <td rowSpan={3} className={styles.noteCell}>
@@ -186,7 +204,7 @@ export default function Home() {
 
             <section className={styles.tableCard}>
               <h3 className={styles.subTitle}>
-                Reverb Size presets · {timeSignature.label}
+                Reverb Size presets · {signatureLabel}
               </h3>
               <div className={styles.tableWrap}>
                 <table className={styles.table}>
@@ -200,7 +218,7 @@ export default function Home() {
                   </thead>
                   <tbody>
                     {reverbRows.map((row, index) => (
-                      <tr key={row.name} className={index % 2 === 0 ? "" : styles.stripedRow}>
+                      <tr key={row.name}>
                         <td>{row.name}</td>
                         <td>{formatMs(row.totalMs)} ({row.totalLabel})</td>
                         <td>
@@ -252,7 +270,7 @@ export default function Home() {
                     return entries.map((entry, noteIndex) => (
                       <tr
                         key={`${row.id}-${entry.label}`}
-                        className={(index * 3 + noteIndex) % 2 === 1 ? styles.stripedRow : ""}
+                        className={index > 0 && noteIndex === 0 ? styles.groupFirstRow : ""}
                       >
                         {noteIndex === 0 ? (
                           <td rowSpan={3} className={styles.noteCell}>
