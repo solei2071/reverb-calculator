@@ -62,7 +62,6 @@ export const NOTE_NOTATIONS: Notation[] = [
   { id: "1/64", label: "1/64", beatValue: 0.0625, description: "1/16 Beat" },
   { id: "1/128", label: "1/128", beatValue: 0.03125, description: "1/32 Beat" },
   { id: "1/256", label: "1/256", beatValue: 0.015625, description: "1/64 Beat" },
-  { id: "1/512", label: "1/512", beatValue: 0.0078125, description: "1/128 Beat" },
 ];
 
 export const REVERB_SIZE_PRESETS: ReadonlyArray<ReverbSizeRow> = [
