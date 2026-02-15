@@ -14,6 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="monetag" content="070c11cf187a189557643dcf3ed2f1d2" />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7431749331315224"
