@@ -72,6 +72,14 @@ export const REVERB_SIZE_PRESETS: ReadonlyArray<ReverbSizeRow> = [
   { name: "Tight Ambience", totalLabel: "1/4 Note", totalBeats: 1, preDelayLabel: "1/256", preDelayBeatValue: 0.015625 },
 ];
 
+export const TIME_SIGNATURES: ReadonlyArray<{ id: string; label: string; beatsPerBar: number }> = [
+  { id: "2/4", label: "2/4", beatsPerBar: 2 },
+  { id: "3/4", label: "3/4", beatsPerBar: 3 },
+  { id: "4/4", label: "4/4", beatsPerBar: 4 },
+  { id: "5/4", label: "5/4", beatsPerBar: 5 },
+  { id: "6/4", label: "6/4", beatsPerBar: 6 },
+];
+
 export const DEFAULT_BPM = 120;
 
 export const MAX_BPM = 999;
@@ -125,9 +133,12 @@ export function getDelayRows(bpm: number): DelayRow[] {
   return NOTE_NOTATIONS.map((notation) => toDelayRow(notation, bpm));
 }
 
-export function getReverbRows(bpm: number): ReverbRow[] {
+export function getReverbRows(bpm: number, beatsPerBar: number): ReverbRow[] {
+  const baseBeatsPerBar = Math.max(1, beatsPerBar);
+  const scale = baseBeatsPerBar / 4;
+
   return REVERB_SIZE_PRESETS.map((preset) => {
-    const totalMs = msFromBpm(bpm, preset.totalBeats);
+    const totalMs = msFromBpm(bpm, preset.totalBeats * scale);
     const preDelayMs = msFromBpm(bpm, preset.preDelayBeatValue);
     return {
       name: preset.name,

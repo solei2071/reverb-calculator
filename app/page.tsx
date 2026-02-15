@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import styles from "./page.module.css";
 import {
   CalculatorMode,
   DEFAULT_BPM,
   MAX_BPM,
   MODE_PRESETS,
+  TIME_SIGNATURES,
   getDelayRows,
   getModeConfig,
   getReverbRows,
@@ -14,6 +16,8 @@ import {
   formatMs,
   normalizeBpm,
 } from "../lib/tempo-calculator";
+
+const BPM_PRESETS = [60, 66, 72, 78, 84, 90, 96, 100, 110, 120, 130, 140, 150, 160];
 
 function toClipboard(value: string): Promise<boolean> {
   if (!navigator.clipboard?.writeText) return Promise.resolve(false);
@@ -25,18 +29,53 @@ function copyBpmToClipboard(value: number, copyType: "ms" | "hz") {
   return `${value.toFixed(2)} Hz`;
 }
 
+function clampTapCount(
+  now: number,
+  values: number[],
+  maxPoints: number,
+  maxWindowMs: number,
+) {
+  const clean = values.filter((value) => now - value <= maxWindowMs);
+  if (clean.length > maxPoints) return clean.slice(clean.length - maxPoints);
+  return clean;
+}
+
 export default function Home() {
   const [bpmInput, setBpmInput] = useState(String(DEFAULT_BPM));
   const [mode, setMode] = useState<CalculatorMode>("delay");
+  const [timeSignatureId, setTimeSignatureId] = useState("4/4");
   const [copyMessage, setCopyMessage] = useState("");
+  const [tapTimes, setTapTimes] = useState<number[]>([]);
 
   const parsedBpm = Number.parseFloat(bpmInput);
   const bpm = useMemo(() => normalizeBpm(parsedBpm), [parsedBpm]);
   const isValidBpm = Number.isFinite(parsedBpm) && parsedBpm >= 1 && parsedBpm <= MAX_BPM;
-  const modeConfig = useMemo(() => getModeConfig(mode), [mode]);
+
+  const timeSignature = TIME_SIGNATURES.find((entry) => entry.id === timeSignatureId) ?? TIME_SIGNATURES[2];
 
   const delayRows = useMemo(() => (isValidBpm ? getDelayRows(bpm) : []), [isValidBpm, bpm]);
-  const reverbRows = useMemo(() => (isValidBpm ? getReverbRows(bpm) : []), [isValidBpm, bpm]);
+  const reverbRows = useMemo(
+    () => (isValidBpm ? getReverbRows(bpm, timeSignature.beatsPerBar) : []),
+    [isValidBpm, bpm, timeSignature.beatsPerBar],
+  );
+  const modeConfig = useMemo(() => getModeConfig(mode), [mode]);
+
+  const detectedBpm = useMemo(() => {
+    if (tapTimes.length < 2) return null;
+
+    const gaps: number[] = [];
+    for (let index = 1; index < tapTimes.length; index += 1) {
+      const interval = tapTimes[index] - tapTimes[index - 1];
+      if (interval >= 120 && interval <= 3000) {
+        gaps.push(interval);
+      }
+    }
+
+    if (!gaps.length) return null;
+    const recent = gaps.slice(-6);
+    const average = recent.reduce((acc, value) => acc + value, 0) / recent.length;
+    return normalizeBpm(60000 / average);
+  }, [tapTimes]);
 
   const onCopy = async (label: string, value: number, copyType: "ms" | "hz") => {
     const done = await toClipboard(copyBpmToClipboard(value, copyType));
@@ -44,15 +83,60 @@ export default function Home() {
     setTimeout(() => setCopyMessage(""), 1300);
   };
 
+  const setTapTime = () => {
+    const now = performance.now();
+    setTapTimes((prev) => {
+      if (prev.length > 0) {
+        const last = prev[prev.length - 1];
+        if (now - last > 3500) {
+          return [now];
+        }
+      }
+      const next = clampTapCount(now, [...prev, now], 12, 12000);
+      return next;
+    });
+  };
+
+  const applyBpmPreset = (targetBpm: number) => {
+    setBpmInput(targetBpm.toFixed(1));
+  };
+
+  const applyTapBpm = () => {
+    if (!detectedBpm) return;
+    setBpmInput(detectedBpm.toFixed(1));
+    setTapTimes([]);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === " " || event.key === "Spacebar") {
+        event.preventDefault();
+        setTapTime();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const onBpmInputKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && detectedBpm) {
+      setBpmInput(detectedBpm.toFixed(1));
+      setTapTimes([]);
+      event.preventDefault();
+    }
+  };
+
   return (
     <main className={styles.page}>
       <section className={styles.card}>
         <p className={styles.badge}>Rhythm Tools</p>
         <h1 className={styles.title}>Delay, Reverb, and LFO Calculator</h1>
-        <p className={styles.subtitle}>Type your tempo and get perfect synced values in one click.</p>
+        <p className={styles.subtitle}>Type your tempo and get synced values in one click.</p>
 
         <div className={styles.heroInputWrap}>
-          <p className={styles.heroLead}>BPM of your track</p>
+          <p className={styles.heroLead}>BPM of your music</p>
           <label htmlFor="bpm-input" className={styles.label}>
             Tempo in BPM
           </label>
@@ -69,10 +153,63 @@ export default function Home() {
             inputMode="decimal"
             aria-describedby="bpm-hint"
             autoFocus
+            onKeyDown={onBpmInputKeyDown}
           />
           <p id="bpm-hint" className={styles.help}>
-            {isValidBpm ? `Detected: ${bpm.toFixed(1)} BPM` : "Type a value from 1 to 999 BPM"}
+            {isValidBpm
+              ? `Detected: ${bpm.toFixed(1)} BPM`
+              : "Type a value from 1 to 999 BPM"}
           </p>
+
+          <div className={styles.presetWrap}>
+            {BPM_PRESETS.map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                className={styles.presetButton}
+                onClick={() => applyBpmPreset(preset)}
+              >
+                {preset}
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.tapWrap}>
+            <button type="button" className={styles.tapButton} onClick={setTapTime}>
+              Tap Tempo
+            </button>
+            <button
+              type="button"
+              className={styles.tapApplyButton}
+              onClick={applyTapBpm}
+              disabled={!detectedBpm}
+            >
+              Use tapped BPM
+            </button>
+            <p className={styles.tapHint}>
+              {detectedBpm ? `Tap result: ${detectedBpm.toFixed(1)} BPM` : "Tap 2+ times to detect"}
+            </p>
+          </div>
+
+          <div className={styles.signatureWrap} role="tablist" aria-label="Time signature">
+            <p className={styles.signatureLabel}>Time Signature</p>
+            <div className={styles.signatureButtons}>
+              {TIME_SIGNATURES.map((signature) => (
+                <button
+                  key={signature.id}
+                  type="button"
+                  className={`${styles.signatureButton} ${
+                    timeSignatureId === signature.id ? styles.activeSignature : ""
+                  }`}
+                  onClick={() => setTimeSignatureId(signature.id)}
+                  role="tab"
+                  aria-selected={timeSignatureId === signature.id}
+                >
+                  {signature.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className={styles.modeButtons} role="tablist" aria-label="Calculator mode">
@@ -124,9 +261,7 @@ export default function Home() {
                   <tbody>
                     {delayRows.map((row, index) => (
                       <tr key={row.id} className={index % 2 === 0 ? "" : styles.stripedRow}>
-                        <td>
-                          {row.noteLabel}
-                        </td>
+                        <td>{row.noteLabel}</td>
                         <td>
                           <button
                             type="button"
@@ -168,7 +303,9 @@ export default function Home() {
             </section>
 
             <section className={styles.tableCard}>
-              <h3 className={styles.subTitle}>Reverb Size presets</h3>
+              <h3 className={styles.subTitle}>
+                Reverb Size presets · {timeSignature.label}
+              </h3>
               <div className={styles.tableWrap}>
                 <table className={styles.table}>
                   <thead>
@@ -214,58 +351,56 @@ export default function Home() {
         {isValidBpm && mode !== "reverb" ? (
           <div className={styles.tableCard}>
             <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Note Value</th>
-                  <th>Normal</th>
-                  <th>Hz</th>
-                  <th>Dotted</th>
-                  <th>Hz</th>
-                  <th>Triplet</th>
-                  <th>Hz</th>
-                </tr>
-              </thead>
-              <tbody>
-                {delayRows.map((row, index) => (
-                  <tr key={row.id} className={index % 2 === 0 ? "" : styles.stripedRow}>
-                    <td>
-                      {row.noteLabel}
-                    </td>
-                    <td>
-                      <button
-                        type="button"
-                        className={styles.valueCell}
-                        onClick={() => onCopy(`${row.noteLabel} ${mode} normal`, row.notesMs, "ms")}
-                      >
-                        {formatMs(row.notesMs)}
-                      </button>
-                    </td>
-                    <td>{formatHz(row.notesHz)}</td>
-                    <td>
-                      <button
-                        type="button"
-                        className={styles.valueCell}
-                        onClick={() => onCopy(`${row.noteLabel} ${mode} dotted`, row.dottedMs, "ms")}
-                      >
-                        {formatMs(row.dottedMs)}
-                      </button>
-                    </td>
-                    <td>{formatHz(row.dottedHz)}</td>
-                    <td>
-                      <button
-                        type="button"
-                        className={styles.valueCell}
-                        onClick={() => onCopy(`${row.noteLabel} ${mode} triplet`, row.tripletMs, "ms")}
-                      >
-                        {formatMs(row.tripletMs)}
-                      </button>
-                    </td>
-                    <td>{formatHz(row.tripletHz)}</td>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Note Value</th>
+                    <th>Normal</th>
+                    <th>Hz</th>
+                    <th>Dotted</th>
+                    <th>Hz</th>
+                    <th>Triplet</th>
+                    <th>Hz</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {delayRows.map((row, index) => (
+                    <tr key={row.id} className={index % 2 === 0 ? "" : styles.stripedRow}>
+                      <td>{row.noteLabel}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className={styles.valueCell}
+                          onClick={() => onCopy(`${row.noteLabel} ${mode} normal`, row.notesMs, "ms")}
+                        >
+                          {formatMs(row.notesMs)}
+                        </button>
+                      </td>
+                      <td>{formatHz(row.notesHz)}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className={styles.valueCell}
+                          onClick={() => onCopy(`${row.noteLabel} ${mode} dotted`, row.dottedMs, "ms")}
+                        >
+                          {formatMs(row.dottedMs)}
+                        </button>
+                      </td>
+                      <td>{formatHz(row.dottedHz)}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className={styles.valueCell}
+                          onClick={() => onCopy(`${row.noteLabel} ${mode} triplet`, row.tripletMs, "ms")}
+                        >
+                          {formatMs(row.tripletMs)}
+                        </button>
+                      </td>
+                      <td>{formatHz(row.tripletHz)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         ) : null}
