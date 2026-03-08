@@ -434,7 +434,17 @@
   margin: 0;
   color: #334155;
   line-height: 1.65;
-  white-space: pre-line;
+}
+
+.guideBlock {
+  margin-top: 0.85rem;
+}
+
+.guideBlockTitle {
+  margin: 0 0 0.3rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e293b;
 }
 
 .faqWrap {

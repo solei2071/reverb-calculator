@@ -3,6 +3,8 @@ import Link from "next/link";
 import "./globals.css";
 import styles from "./shell.module.css";
 import { SITE_NAME, SITE_URL } from "../lib/site-config";
+import CookieConsentBanner from "./components/cookie-consent-banner";
+import AdSenseScript from "./components/adsense-script";
 
 export const metadata: Metadata = {
   title: "Rhythm Tools — Delay, Reverb & LFO Calculator",
@@ -63,6 +65,12 @@ export default function RootLayout({
                 <Link href="/faq" className={styles.navLink}>
                   FAQ
                 </Link>
+                <Link href="/glossary" className={styles.navLink}>
+                  Glossary
+                </Link>
+                <Link href="/articles" className={styles.navLink}>
+                  Articles
+                </Link>
                 <Link href="/about" className={styles.navLink}>
                   About
                 </Link>
@@ -72,19 +80,16 @@ export default function RootLayout({
                 <Link href="/privacy" className={styles.navLink}>
                   Privacy
                 </Link>
+                <Link href="/cookie-policy" className={styles.navLink}>
+                  Cookies
+                </Link>
                 <Link href="/contact" className={styles.navLink}>
                   Contact
                 </Link>
               </nav>
             </div>
           </header>
-          {adsClientId ? (
-            <script
-              async
-              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsClientId}`}
-              crossOrigin="anonymous"
-            />
-          ) : null}
+          <AdSenseScript clientId={adsClientId} />
           <script
             type="application/ld+json"
             suppressHydrationWarning
@@ -103,6 +108,12 @@ export default function RootLayout({
                 <Link href="/faq" className={styles.navLink}>
                   FAQ
                 </Link>
+                <Link href="/glossary" className={styles.navLink}>
+                  Glossary
+                </Link>
+                <Link href="/articles" className={styles.navLink}>
+                  Articles
+                </Link>
                 <Link href="/about" className={styles.navLink}>
                   About
                 </Link>
@@ -112,12 +123,16 @@ export default function RootLayout({
                 <Link href="/privacy" className={styles.navLink}>
                   Privacy Policy
                 </Link>
+                <Link href="/cookie-policy" className={styles.navLink}>
+                  Cookie Policy
+                </Link>
                 <Link href="/contact" className={styles.navLink}>
                   Contact
                 </Link>
               </nav>
             </div>
           </footer>
+          <CookieConsentBanner />
         </div>
       </body>
     </html>

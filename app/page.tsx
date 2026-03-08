@@ -18,30 +18,27 @@ import {
   parseTimeSignature,
 } from "../lib/tempo-calculator";
 
-const calculatorGuide = `
-This calculator helps producers keep delay, reverb, and LFO values in musical sync with the project tempo.
-Enter BPM and each note value immediately returns time values in milliseconds plus frequency in Hz for quick automation setup.
+const guideIntro =
+  "This calculator helps producers keep delay, reverb, and LFO values in musical sync with the project tempo. Enter BPM and each note value immediately returns time values in milliseconds plus frequency in Hz for quick automation setup.";
 
-In practical use, you normally match delay time to 1/4, 1/8, or 1/16 note lengths so rhythm stays tight.
-The triplet rows help when you want shuffled grooves, while dotted values add a swung, late-evolving motion for pads, vocals, and ambient tails.
-Reverb pre-delay and decay values are derived from delay-based note values so you can shape width and depth without losing tempo alignment.
-
-Why tempo-sync math is important:
-If BPM changes across sections, the same delay number can suddenly feel wrong and make a mix feel out of time.
-Using this calculator prevents this drift and makes transitions between verse, pre-chorus, and chorus cleaner.
-For example, delay-heavy vocal scenes often need exact values at higher tempo passages to avoid clutter and blur.
-
-How to get consistent results:
-1) Enter the exact BPM and choose the correct time signature first.
-2) Start with normal note values for foundational rhythmic alignment.
-3) If the groove requires swing or lifted pulse, try triplet timing next.
-4) Use dotted values when you want longer spacing without moving to the next full note length.
-5) In reverb mode, compare preset sizes and tune decay by ear while keeping pre-delay as the depth anchor.
-
-Practical production notes:
-Not every beat value sounds the same in every chain. Compressor latency, delay feedback, plugin character, and gain staging
-change how each number behaves in context. Use this calculator as a trusted baseline and then listen carefully before finalizing.
-`;
+const guideBody = [
+  {
+    heading: "Matching effects to the groove",
+    text: "In practical use, you normally match delay time to 1/4, 1/8, or 1/16 note lengths so the rhythm stays tight. The triplet rows help when you want shuffled grooves, while dotted values add a swung, late-evolving motion for pads, vocals, and ambient tails. Reverb pre-delay and decay values are derived from delay-based note values so you can shape width and depth without losing tempo alignment.",
+  },
+  {
+    heading: "Why tempo-sync math matters",
+    text: "If BPM changes across sections, the same delay number can suddenly feel wrong and make a mix feel out of time. Using this calculator prevents drift and makes transitions between verse, pre-chorus, and chorus cleaner. Delay-heavy vocal scenes often need exact values at higher tempo passages to avoid clutter and blur.",
+  },
+  {
+    heading: "How to get consistent results",
+    text: "Enter the exact BPM and choose the correct time signature first. Start with normal note values for foundational rhythmic alignment. If the groove requires swing or a lifted pulse, try triplet timing next. Use dotted values when you want longer spacing without moving to the next full note length. In reverb mode, compare preset sizes and tune decay by ear while keeping pre-delay as the depth anchor.",
+  },
+  {
+    heading: "Practical production notes",
+    text: "Not every beat value sounds the same in every signal chain. Compressor latency, delay feedback, plugin character, and gain staging change how each number behaves in context. Use this calculator as a trusted baseline and then listen carefully before finalizing. Treat the output as a starting point, not a final answer.",
+  },
+];
 
 const faqItems = [
   {
@@ -348,7 +345,13 @@ export default function Home() {
 
         <section className={styles.contentSection}>
           <h2 className={styles.contentTitle}>How this calculator helps</h2>
-          <p className={styles.contentText}>{calculatorGuide.trim()}</p>
+          <p className={styles.contentText}>{guideIntro}</p>
+          {guideBody.map((section) => (
+            <div key={section.heading} className={styles.guideBlock}>
+              <h3 className={styles.guideBlockTitle}>{section.heading}</h3>
+              <p className={styles.contentText}>{section.text}</p>
+            </div>
+          ))}
         </section>
 
         <section className={styles.contentSection} aria-labelledby="faq-heading">
@@ -368,9 +371,21 @@ export default function Home() {
         <section className={styles.contentSection} aria-labelledby="policy-links">
           <h2 id="policy-links" className={styles.contentTitle}>More information</h2>
           <p className={styles.contentText}>
-            Read more about the site, privacy handling, and support options:
+            Read more about the site, privacy, cookie controls, and support options:
           </p>
           <ul className={styles.contentLinks}>
+            <li>
+              <Link href="/guide">Tempo Sync Guide</Link>
+            </li>
+            <li>
+              <Link href="/faq">FAQ</Link>
+            </li>
+            <li>
+              <Link href="/glossary">Glossary of Terms</Link>
+            </li>
+            <li>
+              <Link href="/articles">Articles</Link>
+            </li>
             <li>
               <Link href="/about">About</Link>
             </li>
@@ -378,13 +393,10 @@ export default function Home() {
               <Link href="/privacy">Privacy Policy</Link>
             </li>
             <li>
+              <Link href="/cookie-policy">Cookie Policy</Link>
+            </li>
+            <li>
               <Link href="/contact">Contact</Link>
-            </li>
-            <li>
-              <Link href="/guide">Tempo Sync Guide</Link>
-            </li>
-            <li>
-              <Link href="/faq">FAQ</Link>
             </li>
             <li>
               <Link href="/terms">Terms of Service</Link>
